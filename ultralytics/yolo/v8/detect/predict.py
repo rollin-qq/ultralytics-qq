@@ -50,8 +50,10 @@ class DetectionPredictor(BasePredictor):
             frame = self.dataset.count
         else:
             frame = getattr(self.dataset, 'frame', 0)
+        #将当前图像数据的路径 p 赋值给实例变量 self.data_path，并根据数据集的模式（image 或 video）以及当前帧数（如果是视频）构造标签文件的路径 self.txt_path。
         self.data_path = p
         self.txt_path = str(self.save_dir / 'labels' / p.stem) + ('' if self.dataset.mode == 'image' else f'_{frame}')
+        #在日志字符串 log_string 的末尾添加当前图像数据的尺寸信息。
         log_string += '%gx%g ' % im.shape[2:]  # print string
         self.annotator = self.get_annotator(im0)
 
