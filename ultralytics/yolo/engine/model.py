@@ -62,6 +62,8 @@ class YOLO:
         else:
             raise NotImplementedError(f"'{suffix}' model loading not implemented")
 
+     #__call__ 方法提供了一种方便的方式来调用 predict 方法，
+     # 因为它允许直接使用对象实例进行函数调用，而不必显式地指定方法名。
     def __call__(self, source=None, stream=False, **kwargs):
         return self.predict(source, stream, **kwargs)
 
@@ -88,10 +90,11 @@ class YOLO:
         Args:
             weights (str): model checkpoint to be loaded
         """
+        #调用 attempt_load_one_weight 函数加载模型，并将返回值分别赋给 self.model 和 self.ckpt
         self.model, self.ckpt = attempt_load_one_weight(weights)
         self.ckpt_path = weights
         self.task = self.model.args["task"]
-        self.overrides = self.model.args
+        self.overrides = self.model.args  #将整个参数字典赋值给实例变量 self.overrides。
         self._reset_ckpt_args(self.overrides)
         self.ModelClass, self.TrainerClass, self.ValidatorClass, self.PredictorClass = \
             self._assign_ops_from_task(self.task)
@@ -137,12 +140,16 @@ class YOLO:
         overrides["conf"] = 0.25
         overrides.update(kwargs)
         overrides["mode"] = "predict"
-        overrides["save"] = kwargs.get("save", False)  # not save files by default
+        overrides["save"] = kwargs.get("save", False)  # get() 方法表示在 kwargs 中查找 "save" 的键值，如果没有找到则默认值为 False。
+        #判断是否已经创建了 predictor 对象。若没有，则创建一个指定类型的 PredictorClass 对象，并通过调用 setup_model() 方法来设置模型；
+        #否则，只需更新 predictor 对象的参数即可，此处使用 get_cfg() 方法来获取新的配置信息并更新到原有参数中。
         if not self.predictor:
             self.predictor = self.PredictorClass(overrides=overrides)
             self.predictor.setup_model(model=self.model)
         else:  # only update args if predictor is already setup
             self.predictor.args = get_cfg(self.predictor.args, overrides)
+        #根据程序运行时的文件名判断是否是命令行模式，如果是则调用 predict_cli() 方法进行预测;
+        #否则直接调用 predict() 方法并传入 source 和 stream 参数进行预测，最终返回预测结果。
         is_cli = sys.argv[0].endswith('yolo') or sys.argv[0].endswith('ultralytics')
         return self.predictor.predict_cli(source=source) if is_cli else self.predictor(source=source, stream=stream)
 

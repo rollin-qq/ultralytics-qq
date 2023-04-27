@@ -18,23 +18,51 @@ workers: 8  # number of worker threads for data loading (per RANK if DDP)
 project:  # project name
 name:  # experiment name
 exist_ok: False  # whether to overwrite existing experiment
-pretrained: False  # whether to use a pretrained model
+pretrained: False  # whether to use a pretrained model是否使用预训练模型。
 optimizer: SGD  # optimizer to use, choices=['SGD', 'Adam', 'AdamW', 'RMSProp']
 verbose: True  # whether to print verbose output
 seed: 0  # random seed for reproducibility
 deterministic: True  # whether to enable deterministic mode
-single_cls: False  # train multi-class data as single-class
+single_cls: False  # train multi-class data as single-class将多类数据视为单类进行训练
 image_weights: False  # use weighted image selection for training
 rect: False  # support rectangular training
-cos_lr: False  # use cosine learning rate scheduler
-close_mosaic: 10  # disable mosaic augmentation for final 10 epochs
-resume: False  # resume training from last checkpoint
+cos_lr: False  # use cosine learning rate scheduler使用余弦学习率调度程序
+close_mosaic: 10  # disable mosaic augmentation for final 10 epochs在最后 10 轮禁用拼贴增强
+resume: False  # resume training from last checkpoint从上一个检查点恢复训练
 # Segmentation
 overlap_mask: True  # masks should overlap during training (segment train only)
 mask_ratio: 4  # mask downsample ratio (segment train only)
 # Classification
 dropout: 0.0  # use dropout regularization (classify train only)
-
+"""
+model：模型文件的路径，例如 yolov8n.pt、yolov8n.yaml。
+data：数据文件的路径，例如 coco128.yaml。
+epochs：训练的轮数。
+patience：如果没有观察到改进，则等待的轮数，以便提前停止训练。
+batch：每批次处理的图像数量（-1 为自动批处理）。
+imgsz：输入图像的大小（整数或 w,h）。
+save：是否保存训练检查点和预测结果。
+cache：是否使用缓存来加载数据。
+device：运行模型的设备，例如 cuda device=0 或 device=0,1,2,3 或 device=cpu。
+workers：数据加载的工作线程数。
+project：项目名称。
+name：实验名称。
+exist_ok：是否覆盖现有实验。
+pretrained：是否使用预训练模型。
+optimizer：优化器类型，可选项为['SGD', 'Adam', 'AdamW', 'RMSProp']。
+verbose：是否打印详细输出。
+seed：用于重现结果的随机种子。
+deterministic：是否启用确定性模式。
+single_cls：将多类数据视为单类进行训练。
+image_weights：使用加权图像选择进行训练。
+rect：支持矩形训练。
+cos_lr：使用余弦学习率调度程序。
+close_mosaic：在最后 10 轮禁用拼贴增强。
+resume：从上一个检查点恢复训练。
+overlap_mask：在训练期间，掩码应该重叠（仅适用于分割训练）。
+mask_ratio：掩码下采样比率（仅适用于分割训练）。
+dropout：使用 dropout 正则化（仅适用于分类训练）。
+"""
 # Val/Test settings ----------------------------------------------------------------------------------------------------
 val: True  # validate/test during training
 save_json: False  # save results to JSON file
@@ -45,13 +73,23 @@ max_det: 300  # maximum number of detections per image
 half: False  # use half precision (FP16)
 dnn: False  # use OpenCV DNN for ONNX inference
 plots: True  # save plots during train/val
-
+"""
+val: True 表示在训练过程中进行验证/测试
+save_json: False 表示不将结果保存为 JSON 文件
+save_hybrid: False 表示不保存标签和其他额外预测的混合版本
+conf: 是一个对象置信度阈值，用于检测，默认情况下为 0.25（预测时）和 0.001（验证时）
+iou: 是 NMS（非极大值抑制）的交并比阈值，默认为 0.7
+max_det: 是每张图像最大检测数，默认为 300
+half: False 表示不使用半精度（FP16）
+dnn: False 表示不使用 OpenCV DNN 进行 ONNX 推理
+plots: True 表示在训练/验证过程中保存绘图结果。
+"""
 # Prediction settings --------------------------------------------------------------------------------------------------
-source:  # source directory for images or videos
+source:  # source directory for images or videos待处理的图像或视频所在的源目录。
 show: False  # show results if possible
 save_txt: False  # save results as .txt file
 save_conf: False  # save results with confidence scores
-save_crop: False  # save cropped images with results
+save_crop: False  # save cropped images with results是否保存带有检测结果的裁剪图像
 hide_labels: False  # hide labels
 hide_conf: False  # hide confidence scores
 vid_stride: 1  # video frame-rate stride
@@ -62,7 +100,23 @@ agnostic_nms: False  # class-agnostic NMS
 classes:  # filter results by class, i.e. class=0, or class=[0,2,3]
 retina_masks: False  # use high-resolution segmentation masks
 boxes: True # Show boxes in segmentation predictions
-
+"""
+source：待处理的图像或视频所在的源目录。
+show：如果可能，是否显示检测结果。
+save_txt：是否将检测结果保存为 .txt 文件。
+save_conf：是否将带有置信度分数的检测结果保存。
+save_crop：是否保存带有检测结果的裁剪图像。
+hide_labels：是否隐藏标签。
+hide_conf：是否隐藏置信度分数。
+vid_stride：视频帧率步长。
+line_thickness：边界框厚度（像素）。
+visualize：是否可视化模型特征。
+augment：是否对预测源应用图像增强。
+agnostic_nms：是否使用类别无关的 NMS。
+classes：按类别过滤结果，例如 class=0 或 class=[0,2,3]。
+retina_masks：是否使用高分辨率分割掩模。
+boxes：是否在分割预测中显示框。
+"""
 # Export settings ------------------------------------------------------------------------------------------------------
 format: torchscript  # format to export to
 keras: False  # use Keras
@@ -73,7 +127,17 @@ simplify: False  # ONNX: simplify model
 opset:  # ONNX: opset version (optional)
 workspace: 4  # TensorRT: workspace size (GB)
 nms: False  # CoreML: add NMS
-
+"""
+format：导出模型的格式，例如 torchscript。
+keras：是否使用 Keras。
+optimize：是否为移动设备进行 TorchScript 优化。
+int8：是否进行 CoreML/TF INT8 量化。
+dynamic：是否启用 ONNX/TF/TensorRT 的动态轴。
+simplify：是否简化 ONNX 模型。
+opset：ONNX 的 opset 版本（可选）。
+workspace：TensorRT 的工作空间大小（GB）。
+nms：是否在 CoreML 中添加 NMS（非极大值抑制）。
+"""
 # Hyperparameters ------------------------------------------------------------------------------------------------------
 lr0: 0.01  # initial learning rate (i.e. SGD=1E-2, Adam=1E-3)
 lrf: 0.01  # final learning rate (lr0 * lrf)
@@ -101,7 +165,34 @@ fliplr: 0.5  # image flip left-right (probability)
 mosaic: 1.0  # image mosaic (probability)
 mixup: 0.0  # image mixup (probability)
 copy_paste: 0.0  # segment copy-paste (probability)
-
+"""
+lr0：初始学习率（例如 SGD=1E-2，Adam=1E-3）。
+lrf：最终学习率（lr0 * lrf）。
+momentum：SGD 动量/Adam beta1。
+weight_decay：优化器权重衰减 5e-4。
+warmup_epochs：预热轮数。
+warmup_momentum：预热初始动量。
+warmup_bias_lr：预热初始偏置学习率。
+box：框损失增益。
+cls：分类损失增益（与像素成比例）。
+dfl：Dfl 损失增益。
+fl_gamma：focal loss gamma（efficientDet 默认 gamma=1.5）。
+label_smoothing：标签平滑（分数）。
+nbs：批次大小。
+hsv_h：图像 HSV-Hue 增强（分数）。
+hsv_s：图像 HSV-Saturation 增强（分数）。
+hsv_v：图像 HSV-Value 增强（分数）。
+degrees：图像旋转（+/- 度）。
+translate：图像平移（+/- 分数）。
+scale：图像缩放（+/- 增益）。
+shear：图像剪切（+/- 度）。
+perspective：图像透视（+/- 分数），范围 0-0.001。
+flipud：图像上下翻转的概率。
+fliplr：图像左右翻转的概率。
+mosaic：图像拼贴的概率。
+mixup：图像混合的概率。
+copy_paste：分割复制-粘贴的概率。
+"""
 # Custom config.yaml ---------------------------------------------------------------------------------------------------
 cfg:  # for overriding defaults.yaml
 
