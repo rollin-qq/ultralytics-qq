@@ -133,6 +133,7 @@ class BasePredictor:
         self.source_type = self.dataset.source_type
         self.vid_path, self.vid_writer = [None] * self.dataset.bs, [None] * self.dataset.bs
 
+    #API调用时的predict主程序
     def stream_inference(self, source=None, model=None):
         self.run_callbacks("on_predict_start")
         if self.args.verbose:

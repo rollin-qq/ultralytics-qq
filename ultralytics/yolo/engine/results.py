@@ -36,6 +36,11 @@ class Results:
         pass
         # TODO masks.pandas + boxes.pandas + cls.pandas
 
+    '''
+    方法首先创建一个新的 Results 对象 r，并将原始形状 self.orig_shape 传递给它。
+    然后，该方法遍历了该类对象的所有属性，如果一个属性的值为 None，则跳过该属性。否则，该方法从该属性中获取指定索引位置的值，并将该值设置为新 Results 对象 r 的相应属性的值。
+    最后，该方法返回新的 Results 对象 r。
+    '''
     def __getitem__(self, idx):
         r = Results(orig_shape=self.orig_shape)
         for item in self.comp:
@@ -136,14 +141,20 @@ class Boxes:
     """
 
     def __init__(self, boxes, orig_shape) -> None:
+        #如果 boxes 是一维数组，则使用 numpy 库中的 None 方法将其转换为二维数组。
         if boxes.ndim == 1:
             boxes = boxes[None, :]
-        assert boxes.shape[-1] == 6  # xyxy, conf, cls
+        
+        assert boxes.shape[-1] == 6  # 数组的最后一维应该是6，分别代表了目标框的坐标（左上角和右下角），置信度和类别。xyxy, conf, cls
         self.boxes = boxes
+        #如果 boxes 是PyTorch张量（torch.Tensor）类型，则将 orig_shape 转换为张量类型，并将其存储在与 boxes 相同的设备上；
+        #否则，将其转换为NumPy数组并存储在 self.orig_shape 中。
+        #？？？？
         self.orig_shape = torch.as_tensor(orig_shape, device=boxes.device) if isinstance(boxes, torch.Tensor) \
             else np.asarray(orig_shape)
 
     @property
+    #result.boxes.xyxy   # box with xyxy format
     def xyxy(self):
         return self.boxes[:, :4]
 
@@ -157,16 +168,20 @@ class Boxes:
 
     @property
     @lru_cache(maxsize=2)  # maxsize 1 should suffice
+    #result.boxes.xywh   # box with xywh format
     def xywh(self):
         return ops.xyxy2xywh(self.xyxy)
 
+
     @property
     @lru_cache(maxsize=2)
+    # result.boxes.xyxyn  # box with xyxy format but normalized
     def xyxyn(self):
         return self.xyxy / self.orig_shape[[1, 0, 1, 0]]
 
     @property
     @lru_cache(maxsize=2)
+    # result.boxes.xywhn  # box with xywh format but normalized
     def xywhn(self):
         return self.xywh / self.orig_shape[[1, 0, 1, 0]]
 
