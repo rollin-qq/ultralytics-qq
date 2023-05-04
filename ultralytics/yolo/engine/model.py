@@ -203,7 +203,8 @@ class YOLO:
             overrides = yaml_load(check_yaml(kwargs["cfg"]), append_filename=True)
         overrides["task"] = self.task
         overrides["mode"] = "train"
-        if not overrides.get("data"):
+        #获取"data"参数的值，如果该值不存在或为None，则意味着数据集文件路径未指定。
+        if not overrides.get("data"):     #if not true/if none
             raise AttributeError("Dataset required but missing, i.e. pass 'data=coco128.yaml'")
         if overrides.get("resume"):
             overrides["resume"] = self.ckpt_path
@@ -230,7 +231,8 @@ class YOLO:
     def _assign_ops_from_task(self, task):
         model_class, train_lit, val_lit, pred_lit = MODEL_MAP[task]
         # warning: eval is unsafe. Use with caution
-        trainer_class = eval(train_lit.replace("TYPE", f"{self.type}"))
+        # 动态选择要实例化的类，eval可见字符串转成相应对象
+        trainer_class = eval(train_lit.replace("TYPE", f"{self.type}"))     #将字符串train_lit中的"TYPE"替换为self.type的值
         validator_class = eval(val_lit.replace("TYPE", f"{self.type}"))
         predictor_class = eval(pred_lit.replace("TYPE", f"{self.type}"))
 
@@ -261,6 +263,6 @@ class YOLO:
     def _reset_ckpt_args(args):
         for arg in 'verbose', 'project', 'name', 'exist_ok', 'resume', 'batch', 'epochs', 'cache', 'save_json', \
                 'half', 'v5loader':
-            args.pop(arg, None)
+            args.pop(arg, None)         #在列表args中删除索引位置为arg的元素，并返回该元素的值。如果列表args中不存在索引位置为arg的元素，则返回默认值None。
 
         args["device"] = ''  # set device to '' to prevent auto-DDP usage
