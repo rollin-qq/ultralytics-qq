@@ -462,6 +462,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
 def guess_model_task(model):
     """
     Guess the task of a PyTorch model from its architecture or configuration.
+    非显示指定模型任务（i.e. 'task=detect', 'task=segment' or 'task=classify'.）时，猜测模型任务
 
     Args:
         model (nn.Module) or (dict): PyTorch model or model configuration in YAML format.
@@ -477,8 +478,11 @@ def guess_model_task(model):
         cfg = model
     elif isinstance(model, nn.Module):  # PyTorch model
         for x in 'model.args', 'model.model.args', 'model.model.model.args':
+            #contextlib.suppress(Exception)是一个上下文管理器，它可以帮助我们忽略指定的异常。
+            # 在使用该上下文管理器时，我们将要执行的代码放在with语句块中，并将可能会发生的异常作为参数传递给suppress函数。
+            # 如果在执行with语句块时出现了这些异常，suppress函数会捕获并忽略它们，然后程序会继续执行with语句块之后的代码。
             with contextlib.suppress(Exception):
-                return eval(x)['task']
+                return eval(x)['task']          #执行字符串表达式x所代表的Python代码，并从代码的结果中获取task属性的值。具体地，x是一个字符串，它包含了要执行的Python代码，例如'model.args'、'model.yaml'等。
         for x in 'model.yaml', 'model.model.yaml', 'model.model.model.yaml':
             with contextlib.suppress(Exception):
                 cfg = eval(x)
